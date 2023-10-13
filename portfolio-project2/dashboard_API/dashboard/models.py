@@ -305,7 +305,7 @@ class PieData(models.Model):
     Represents a transaction.
 
     Attributes:
-        ID (CharField): The unique identifier for the piechart.
+        IDpie (CharField): The unique identifier for the piechart.
         label (CharField): The label associated with the piechart.
         value (IntegerField): The value associated with the piechart.
         colour (CharField): The colour associated with the piechart.
@@ -318,7 +318,7 @@ class PieData(models.Model):
         verbose_name_plural = "PieDatas"
     """
 
-    ID = models.CharField(
+    IDpie = models.CharField(
         max_length=255,
         help_text="The ID associated with the piechart."
     )
@@ -341,7 +341,7 @@ class PieData(models.Model):
         Returns:
             str: The name associated with the piechart.
         """
-        return self.ID
+        return self.IDpie
     
     class Meta:
         verbose_name = "PieData"
@@ -354,7 +354,7 @@ class LineData(models.Model):
     Represents a transaction.
 
     Attributes:
-        ID (CharField): The unique identifier for the linechart.
+        IDline (CharField): The unique identifier for the linechart.
         color (CharField): The colour associated with the linechart.
         data (JSONField()): The data associated with the linechart.
 
@@ -366,7 +366,7 @@ class LineData(models.Model):
         verbose_name_plural = "LineDatas"
     """
 
-    ID = models.CharField(
+    IDline = models.CharField(
         max_length=255,
         help_text="The ID associated with the linechart."
     )
@@ -384,7 +384,7 @@ class LineData(models.Model):
         Returns:
             str: The name associated with the linechart.
         """
-        return self.ID
+        return self.IDline
     
     class Meta:
         verbose_name = "LineData"
