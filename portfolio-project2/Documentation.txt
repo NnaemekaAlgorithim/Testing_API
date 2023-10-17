@@ -1,5 +1,5 @@
 Listing all team members:
-curl -X GET http://127.0.0.1:8000/teams/
+curl -X GET http://35.208.109.101:8000/teams/
 
 Example response:
 [
@@ -21,7 +21,7 @@ curl -X POST -H "Content-Type: application/json" -d '{
     "age": "65",
     "phone": "(444)555-6239",
     "access": "admin"
-}' http://127.0.0.1:8000/teams/
+}' http://35.208.109.101:80/teams/
 
 
 Example response:
