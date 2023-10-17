@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
             name='LineData',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('ID', models.CharField(help_text='The ID associated with the linechart.', max_length=255)),
+                ('IDline', models.CharField(help_text='The ID associated with the linechart.', max_length=255)),
                 ('color', models.CharField(help_text='The colour associated with the linechart.', max_length=255)),
                 ('data', models.JSONField(help_text='The data associated with the linechart.')),
             ],
@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
             name='PieData',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('ID', models.CharField(help_text='The ID associated with the piechart.', max_length=255)),
+                ('IDpie', models.CharField(help_text='The ID associated with the piechart.', max_length=255)),
                 ('label', models.CharField(help_text='The label associated with the piechart.', max_length=255)),
                 ('value', models.IntegerField(help_text='The value associated with the piechart.')),
                 ('colour', models.CharField(help_text='The colour associated with the piechart.', max_length=255)),

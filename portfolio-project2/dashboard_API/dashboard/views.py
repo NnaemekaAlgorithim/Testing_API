@@ -1,235 +1,274 @@
-from rest_framework import generics
 from .models import Team, CustomerContact, Invoice, Transactions, BarData, PieData, LineData
 from .serializers import TeamSerializer, InvoiceSerializer, ContactsSerializer, TransactionSerializer, BarDataSerializer, PieDataSerializer, LineDataSerializer
-
-class TeamListView(generics.ListCreateAPIView):
-    """
-    View for listing and creating Team members.
-
-    Attributes:
-        queryset (QuerySet): The queryset containing Team members.
-        serializer_class (Serializer): The serializer class to use for Team members.
-
-    Example Usage:
-        To list Team members, make a GET request to this view.
-        To create a new Team member, make a POST request with the required data.
-    """
-    queryset = Team.objects.all()
-    serializer_class = TeamSerializer  # Use the GenericModelSerializer
-
-class TeamDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    View for retrieving, updating, and deleting a Team member.
-
-    Attributes:
-        queryset (QuerySet): The queryset containing Team members.
-        serializer_class (Serializer): The serializer class to use for Team members.
-
-    Example Usage:
-        To retrieve a Team member, make a GET request to this view with the Team's ID.
-        To update a Team member, make a PUT or PATCH request with the updated data.
-        To delete a Team member, make a DELETE request with the Team's ID.
-    """
-    queryset = Team.objects.all()
-    serializer_class = TeamSerializer  # Use the GenericModelSerializer
+from rest_framework.decorators import api_view
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.response import Response
+from rest_framework import status
 
 
+# Use the @api_view decorator to specify the accepted HTTP methods
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+def team_list(request):
+    if request.method == 'GET':
+        teams = Team.objects.all()
+        serializer = TeamSerializer(teams, many=True)
+        return Response(serializer.data)
 
+    elif request.method == 'POST':
+        serializer = TeamSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class InvoiceListView(generics.ListCreateAPIView):
-    """
-    View for listing and creating Invoices.
+@api_view(['GET', 'PUT', 'DELETE'])
+def team_detail(request, pk):
+    try:
+        team = Team.objects.get(pk=pk)
+    except Team.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-    Attributes:
-        queryset (QuerySet): The queryset containing Invoices.
-        serializer_class (Serializer): The serializer class to use for Invoices.
+    if request.method == 'GET':
+        serializer = TeamSerializer(team)
+        return Response(serializer.data)
 
-    Example Usage:
-        To list Invoices, make a GET request to this view.
-        To create a new Invoice, make a POST request with the required data.
-    """
-    queryset = Invoice.objects.all()
-    serializer_class = InvoiceSerializer  # Use the GenericModelSerializer
+    elif request.method == 'PUT':
+        serializer = TeamSerializer(team, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class InvoiceDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    View for retrieving, updating, and deleting an Invoice.
-
-    Attributes:
-        queryset (QuerySet): The queryset containing Invoices.
-        serializer_class (Serializer): The serializer class to use for Invoices.
-
-    Example Usage:
-        To retrieve an Invoice, make a GET request to this view with the Invoice's ID.
-        To update an Invoice, make a PUT or PATCH request with the updated data.
-        To delete an Invoice, make a DELETE request with the Invoice's ID.
-    """
-    queryset = Invoice.objects.all()
-    serializer_class = InvoiceSerializer  # Use the GenericModelSerializer
+    elif request.method == 'DELETE':
+        team.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 
+# Invoice views
+@api_view(['GET', 'POST'])
+def invoice_list(request):
+    if request.method == 'GET':
+        invoices = Invoice.objects.all()
+        serializer = InvoiceSerializer(invoices, many=True)
+        return Response(serializer.data)
 
-class CustomerContactsListView(generics.ListCreateAPIView):
-    """
-    View for listing and creating Customer Contacts.
+    elif request.method == 'POST':
+        serializer = InvoiceSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    Attributes:
-        queryset (QuerySet): The queryset containing Customer Contacts.
-        serializer_class (Serializer): The serializer class to use for Customer Contacts.
+@api_view(['GET', 'PUT', 'DELETE'])
+def invoice_detail(request, pk):
+    try:
+        invoice = Invoice.objects.get(pk=pk)
+    except Invoice.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-    Example Usage:
-        To list Customer Contacts, make a GET request to this view.
-        To create a new Customer Contact, make a POST request with the required data.
-    """
-    queryset = CustomerContact.objects.all()
-    serializer_class = ContactsSerializer  # Use the GenericModelSerializer
+    if request.method == 'GET':
+        serializer = InvoiceSerializer(invoice)
+        return Response(serializer.data)
 
-class CustomerContactsDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    View for retrieving, updating, and deleting a Customer Contact.
+    elif request.method == 'PUT':
+        serializer = InvoiceSerializer(invoice, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    Attributes:
-        queryset (QuerySet): The queryset containing Customer Contacts.
-        serializer_class (Serializer): The serializer class to use for Customer Contacts.
-
-    Example Usage:
-        To retrieve a Customer Contact, make a GET request to this view with the Customer Contact's ID.
-        To update a Customer Contact, make a PUT or PATCH request with the updated data.
-        To delete a Customer Contact, make a DELETE request with the Customer Contact's ID.
-    """
-    queryset = CustomerContact.objects.all()
-    serializer_class = ContactsSerializer  # Use the GenericModelSerializer
+    elif request.method == 'DELETE':
+        invoice.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 
+# Customer Contact views
+@api_view(['GET', 'POST'])
+def customer_contacts_list(request):
+    if request.method == 'GET':
+        customer_contacts = CustomerContact.objects.all()
+        serializer = ContactsSerializer(customer_contacts, many=True)
+        return Response(serializer.data)
 
-class TransactionListView(generics.ListCreateAPIView):
-    """
-    View for listing and creating Transactions.
+    elif request.method == 'POST':
+        serializer = ContactsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    Attributes:
-        queryset (QuerySet): The queryset containing Transactions.
-        serializer_class (Serializer): The serializer class to use for Transactions.
+@api_view(['GET', 'PUT', 'DELETE'])
+def customer_contacts_detail(request, pk):
+    try:
+        customer_contacts = CustomerContact.objects.get(pk=pk)
+    except CustomerContact.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
-    Example Usage:
-        To list Transactions, make a GET request to this view.
-        To create a new Transaction, make a POST request with the required data.
-    """
-    queryset = Transactions.objects.all()
-    serializer_class = TransactionSerializer  # Use the GenericModelSerializer
+    if request.method == 'GET':
+        serializer = ContactsSerializer(customer_contacts)
+        return Response(serializer.data)
 
-class TransactionDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    View for retrieving, updating, and deleting a Transaction.
+    elif request.method == 'PUT':
+        serializer = ContactsSerializer(customer_contacts, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    Attributes:
-        queryset (QuerySet): The queryset containing Transactions.
-        serializer_class (Serializer): The serializer class to use for Transactions.
+    elif request.method == 'DELETE':
+        customer_contacts.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+@api_view(['GET', 'POST'])
+def transaction_list(request):
+    if request.method == 'GET':
+        transactions = Transactions.objects.all()
+        serializer = TransactionSerializer(transactions, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = TransactionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def transaction_detail(request, pk):
+    try:
+        transaction = Transactions.objects.get(pk=pk)
+    except Transactions.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = TransactionSerializer(transaction)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = TransactionSerializer(transaction, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        transaction.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+@api_view(['GET', 'POST'])
+def bar_data_list(request):
+    if request.method == 'GET':
+        bar_data = BarData.objects.all()
+        serializer = BarDataSerializer(bar_data, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = BarDataSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def bar_data_detail(request, pk):
+    try:
+        bar_data = BarData.objects.get(pk=pk)
+    except BarData.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = BarDataSerializer(bar_data)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = BarDataSerializer(bar_data, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        bar_data.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+@api_view(['GET', 'POST'])
+def pie_data_list(request):
+    if request.method == 'GET':
+        pie_data = PieData.objects.all()
+        serializer = PieDataSerializer(pie_data, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = PieDataSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+def pie_data_detail(request, pk):
+    try:
+        pie_data = PieData.objects.get(pk=pk)
+    except PieData.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = PieDataSerializer(pie_data)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = PieDataSerializer(pie_data, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        pie_data.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+@api_view(['GET', 'POST'])
+def line_data_list(request):
+    if request.method == 'GET':
+        line_data = LineData.objects.all()
+        serializer = LineDataSerializer(line_data, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = LineDataSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    Example Usage:
-        To retrieve a Transaction, make a GET request to this view with the Transaction's ID.
-        To update a Transaction, make a PUT or PATCH request with the updated data.
-        To delete a Transaction, make a DELETE request with the Transaction's ID.
-    """
-    queryset = Transactions.objects.all()
-    serializer_class = TransactionSerializer  # Use the GenericModelSerializer
+@api_view(['GET', 'PUT', 'DELETE'])
+def line_data_detail(request, pk):
+    try:
+        line_data = LineData.objects.get(pk=pk)
+    except LineData.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
+    if request.method == 'GET':
+        serializer = LineDataSerializer(line_data)
+        return Response(serializer.data)
 
+    elif request.method == 'PUT':
+        serializer = LineDataSerializer(line_data, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    elif request.method == 'DELETE':
+        line_data.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-class BarDataListView(generics.ListCreateAPIView):
-    """
-    View for listing and creating BarData.
-
-    Attributes:
-        queryset (QuerySet): The queryset containing BarData.
-        serializer_class (Serializer): The serializer class to use for BarData.
-
-    Example Usage:
-        To list BarData, make a GET request to this view.
-        To create a new BarData, make a POST request with the required data.
-    """
-    queryset = BarData.objects.all()
-    serializer_class = BarDataSerializer  # Use the GenericModelSerializer
-
-class BarDataDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    View for retrieving, updating, and deleting BarData.
-
-    Attributes:
-        queryset (QuerySet): The queryset containing BarData.
-        serializer_class (Serializer): The serializer class to use for BarData.
-    
-    Example Usage:
-        To retrieve BarData, make a GET request to this view with the BarData's ID.
-        To update BarData, make a PUT or PATCH request with the updated data.
-        To delete BarData, make a DELETE request with the BarData's ID.
-    """
-    queryset = BarData.objects.all()
-    serializer_class = BarDataSerializer  # Use the GenericModelSerializer
-
-
-
-
-class PieDataListView(generics.ListCreateAPIView):
-    """
-    View for listing and creating PieData.
-
-    Attributes:
-        Query set (QuerySet): The queryset containing PieData.
-        serializer_class (Serializer): The serializer class to use for PieData.
-
-    Example Usage:
-        To list PieData, make a GET request to this view.
-        To create a new PieData, make a POST request with the required data.
-    """
-    queryset = PieData.objects.all()
-    serializer_class = PieDataSerializer  # Use the GenericModelSerializer
-
-class PieDataDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    View for retrieving, updating, and deleting PieData.
-
-    Attributes:
-        Query set (QuerySet): The queryset containing PieData.
-        serializer_class (Serializer): The serializer class to use for PieData.
-    
-    Example Usage:
-        To list PieData, make a GET request to this view.
-        To create a new PieData, make a POST request with the required data.
-    """
-    queryset = PieData.objects.all()
-    serializer_class = PieDataSerializer  # Use the GenericModelSerializer
-
-
-
-class LineDataListView(generics.ListCreateAPIView):
-    """
-    View for listing and creating LineData.
-
-    Attributes:
-        Query set (QuerySet): The queryset containing LineData.
-        serializer_class (Serializer): The serializer class to use for LineData.
-
-    Example Usage:
-        To list LineData, make a GET request to this view.
-        To create a new LineData, make a POST request with the required data.
-    """
-    queryset = LineData.objects.all()
-    serializer_class = LineDataSerializer  # Use the GenericModelSerializer
-
-class LineDataDetailView(generics.RetrieveUpdateDestroyAPIView):
-        """
-        View for retrieving, updating, and deleting LineData.
-
-        Attributes:
-            Query set (QuerySet): The queryset containing LineData.
-            serializer_class (Serializer): The serializer class to use for LineData.
-        
-        Example Usage:
-            To list LineData, make a GET request to this view.
-            To create a new LineData, make a POST request with the required data.
-        """
-        queryset = LineData.objects.all()
-        serializer_class = LineDataSerializer  # Use the GenericModelSerializer
